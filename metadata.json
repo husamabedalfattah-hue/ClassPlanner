@@ -1,0 +1,5 @@
+{
+  "name": "ClassPlanner",
+  "description": "A smart classroom seating chart generator allowing teachers to create, manage, and print student seating arrangements with various grouping strategies.",
+  "requestFramePermissions": []
+}
