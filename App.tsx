@@ -72,16 +72,16 @@ const AccordionSection = ({
     <div className="border-b border-slate-100 last:border-0">
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 bg-white hover:bg-slate-50 transition-colors"
+        className="w-full flex items-center justify-between p-5 bg-white hover:bg-slate-50 transition-colors"
       >
-        <div className="flex items-center gap-2 text-slate-700 font-bold text-sm">
-          <Icon className="w-4 h-4 text-indigo-500" />
+        <div className="flex items-center gap-3 text-slate-800 font-bold text-base">
+          <Icon className="w-5 h-5 text-indigo-600" />
           {title}
         </div>
-        <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
       {isOpen && (
-        <div className="p-4 bg-slate-50/50 animate-in slide-in-from-top-1">
+        <div className="p-5 bg-slate-50/50 animate-in slide-in-from-top-1">
           {children}
         </div>
       )}
@@ -409,26 +409,25 @@ export default function App() {
     
     try {
       // Small delay to allow UI to reset to zoom 1
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       const canvas = await html2canvas(printRef.current, {
-        scale: 3, // High resolution for clear names
+        scale: 2, // Slightly lower scale might help with text rendering artifacts
         useCORS: true,
         logging: false,
-        backgroundColor: null, // Transparent to keep container background
+        backgroundColor: null,
+        scrollY: -window.scrollY // Fix for some scrolling related alignment issues
       });
 
       const imgData = canvas.toDataURL('image/png');
       
-      // Calculate dimensions to fit A4 landscape or maintain aspect ratio
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
       
-      // Initialize PDF (landscape)
       const pdf = new jsPDF({
         orientation: 'landscape',
         unit: 'px',
-        format: [imgWidth, imgHeight] // Match canvas size for 1:1 fidelity
+        format: [imgWidth, imgHeight]
       });
 
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
@@ -575,27 +574,27 @@ ${groupsList}
       <div className="w-96 flex-shrink-0 bg-white border-r border-slate-200 flex flex-col z-20 shadow-xl no-print" style={{ fontFamily: 'Fredoka, sans-serif' }}>
         
         {/* Header */}
-        <div className="p-5 border-b border-slate-100 bg-slate-50">
-          <div className="flex items-center gap-2 mb-1">
-            <Users className="w-6 h-6 text-indigo-600" />
-            <h1 className="text-xl font-bold text-slate-800">ClassPlanner</h1>
+        <div className="p-6 border-b border-slate-100 bg-slate-50">
+          <div className="flex items-center gap-2 mb-2">
+            <Users className="w-7 h-7 text-indigo-600" />
+            <h1 className="text-2xl font-bold text-slate-800">ClassPlanner</h1>
           </div>
-          <div className="flex justify-between items-center">
-            <p className="text-xs text-slate-500 font-medium">Drag & Drop students to rearrange</p>
-            <div className="flex gap-1">
+          <div className="flex justify-between items-center mt-2">
+            <p className="text-sm text-slate-500 font-medium">Drag & Drop to rearrange</p>
+            <div className="flex gap-2">
                <button 
                 onClick={handleExportPlan} 
-                className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded"
+                className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded"
                 title="Save/Export Plan to File"
                >
-                 <Download className="w-4 h-4" />
+                 <Download className="w-5 h-5" />
                </button>
                <button 
                 onClick={() => jsonInputRef.current?.click()} 
-                className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded"
+                className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded"
                 title="Load/Import Plan from File"
                >
-                 <Upload className="w-4 h-4" />
+                 <Upload className="w-5 h-5" />
                </button>
                <input 
                  type="file" 
@@ -613,71 +612,71 @@ ${groupsList}
           
           {/* SECTION 1: Class Details & Layout */}
           <AccordionSection title="Class & Layout" icon={Settings} defaultOpen={true}>
-            <div className="space-y-4">
+            <div className="space-y-5">
                {/* Inputs */}
-               <div className="grid grid-cols-2 gap-2">
+               <div className="grid grid-cols-2 gap-3">
                  <div>
-                    <label className="text-[10px] font-bold text-slate-400 uppercase">Class</label>
+                    <label className="text-xs font-bold text-slate-500 uppercase mb-1 block">Class</label>
                     <input 
                       type="text" 
                       value={config.className}
                       onChange={(e) => setConfig({...config, className: e.target.value})}
-                      className="w-full text-xs border-slate-200 rounded focus:border-indigo-500 p-1.5 border"
+                      className="w-full text-sm border-slate-200 rounded-lg focus:border-indigo-500 p-2.5 border"
                     />
                  </div>
                  <div>
-                    <label className="text-[10px] font-bold text-slate-400 uppercase">Subject</label>
+                    <label className="text-xs font-bold text-slate-500 uppercase mb-1 block">Subject</label>
                     <input 
                       type="text" 
                       value={config.subject}
                       onChange={(e) => setConfig({...config, subject: e.target.value})}
-                      className="w-full text-xs border-slate-200 rounded focus:border-indigo-500 p-1.5 border"
+                      className="w-full text-sm border-slate-200 rounded-lg focus:border-indigo-500 p-2.5 border"
                     />
                  </div>
                </div>
                <div>
-                  <label className="text-[10px] font-bold text-slate-400 uppercase">Teacher</label>
+                  <label className="text-xs font-bold text-slate-500 uppercase mb-1 block">Teacher</label>
                   <input 
                     type="text" 
                     value={config.teacherName}
                     onChange={(e) => setConfig({...config, teacherName: e.target.value})}
-                    className="w-full text-xs border-slate-200 rounded focus:border-indigo-500 p-2 border font-medium text-slate-700"
+                    className="w-full text-sm border-slate-200 rounded-lg focus:border-indigo-500 p-2.5 border font-medium text-slate-700"
                     placeholder="Enter Teacher Name"
                   />
                </div>
                
                {/* New Layout Selector */}
                <div>
-                 <label className="text-[10px] font-bold text-slate-400 uppercase mb-2 block">Layout Style</label>
+                 <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">Layout Style</label>
                  <div className="grid grid-cols-3 gap-2">
                     <button 
                       onClick={() => setConfig({...config, layoutMode: 'circle'})}
-                      className={`flex flex-col items-center justify-center gap-1 py-2 rounded border transition-all ${config.layoutMode === 'circle' ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+                      className={`flex flex-col items-center justify-center gap-2 py-3 rounded-lg border transition-all ${config.layoutMode === 'circle' ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
                     >
-                      <Circle className="w-4 h-4" />
-                      <span className="text-[10px] font-bold">Tables</span>
+                      <Circle className="w-5 h-5" />
+                      <span className="text-xs font-bold">Tables</span>
                     </button>
                     <button 
                       onClick={() => setConfig({...config, layoutMode: 'rect'})}
-                      className={`flex flex-col items-center justify-center gap-1 py-2 rounded border transition-all ${config.layoutMode === 'rect' ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+                      className={`flex flex-col items-center justify-center gap-2 py-3 rounded-lg border transition-all ${config.layoutMode === 'rect' ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
                     >
-                      <Layout className="w-4 h-4" />
-                      <span className="text-[10px] font-bold">Groups</span>
+                      <Layout className="w-5 h-5" />
+                      <span className="text-xs font-bold">Groups</span>
                     </button>
                     <button 
                       onClick={() => setConfig({...config, layoutMode: 'row'})}
-                      className={`flex flex-col items-center justify-center gap-1 py-2 rounded border transition-all ${config.layoutMode === 'row' ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+                      className={`flex flex-col items-center justify-center gap-2 py-3 rounded-lg border transition-all ${config.layoutMode === 'row' ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
                     >
-                      <Rows className="w-4 h-4" />
-                      <span className="text-[10px] font-bold">Rows</span>
+                      <Rows className="w-5 h-5" />
+                      <span className="text-xs font-bold">Rows</span>
                     </button>
                  </div>
                </div>
 
-               <div className="border-t border-slate-200 pt-3">
-                  <div className="flex justify-between text-xs text-slate-600 mb-1">
-                    <span>Group Size / Row Length</span>
-                    <span className="font-bold">{config.groupSize} Students</span>
+               <div className="border-t border-slate-200 pt-4">
+                  <div className="flex justify-between text-xs text-slate-600 mb-2">
+                    <span className="font-semibold">Group Size / Row Length</span>
+                    <span className="font-bold text-indigo-600">{config.groupSize} Students</span>
                   </div>
                   <input 
                     type="range" 
@@ -690,23 +689,23 @@ ${groupsList}
                </div>
 
                <div>
-                 <label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Strategy</label>
-                 <div className="grid grid-cols-3 gap-1">
+                 <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">Strategy</label>
+                 <div className="grid grid-cols-3 gap-2">
                     <button 
                       onClick={() => setConfig({...config, strategy: 'random'})}
-                      className={`text-[10px] py-1.5 rounded border ${config.strategy === 'random' ? 'bg-indigo-50 border-indigo-500 text-indigo-700 font-bold' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+                      className={`text-xs py-2.5 rounded-lg border ${config.strategy === 'random' ? 'bg-indigo-50 border-indigo-500 text-indigo-700 font-bold' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
                     >
                       Random
                     </button>
                     <button 
                       onClick={() => setConfig({...config, strategy: 'mix'})}
-                      className={`text-[10px] py-1.5 rounded border ${config.strategy === 'mix' ? 'bg-indigo-50 border-indigo-500 text-indigo-700 font-bold' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+                      className={`text-xs py-2.5 rounded-lg border ${config.strategy === 'mix' ? 'bg-indigo-50 border-indigo-500 text-indigo-700 font-bold' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
                     >
                       Mix Levels
                     </button>
                     <button 
                       onClick={() => setConfig({...config, strategy: 'group'})}
-                      className={`text-[10px] py-1.5 rounded border ${config.strategy === 'group' ? 'bg-indigo-50 border-indigo-500 text-indigo-700 font-bold' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+                      className={`text-xs py-2.5 rounded-lg border ${config.strategy === 'group' ? 'bg-indigo-50 border-indigo-500 text-indigo-700 font-bold' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
                     >
                       Match Levels
                     </button>
@@ -717,54 +716,54 @@ ${groupsList}
 
           {/* SECTION 2: Students */}
           <AccordionSection title={`Students (${students.length})`} icon={Users} defaultOpen={false}>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="flex gap-2">
                   <button 
                     onClick={() => setIsBulkMode(!isBulkMode)}
-                    className={`flex-1 text-xs px-2 py-1.5 rounded flex justify-center items-center gap-1 font-bold border transition-colors ${isBulkMode ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-indigo-600 border-indigo-200 hover:border-indigo-400'}`}
+                    className={`flex-1 text-xs px-3 py-2.5 rounded-lg flex justify-center items-center gap-1 font-bold border transition-colors ${isBulkMode ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-indigo-600 border-indigo-200 hover:border-indigo-400'}`}
                   >
-                    <ClipboardList className="w-3 h-3" /> {isBulkMode ? 'Cancel Paste' : 'Paste List'}
+                    <ClipboardList className="w-4 h-4" /> {isBulkMode ? 'Cancel Paste' : 'Paste List'}
                   </button>
                   <button 
                     onClick={addStudent}
-                    className="flex-1 text-xs bg-indigo-100 text-indigo-700 px-2 py-1.5 rounded hover:bg-indigo-200 flex justify-center items-center gap-1 font-bold"
+                    className="flex-1 text-xs bg-indigo-100 text-indigo-700 px-3 py-2.5 rounded-lg hover:bg-indigo-200 flex justify-center items-center gap-1 font-bold"
                   >
-                    <UserPlus className="w-3 h-3" /> Add One
+                    <UserPlus className="w-4 h-4" /> Add One
                   </button>
               </div>
 
               {isBulkMode && (
-                <div className="bg-white p-2 rounded-lg border border-indigo-200 shadow-sm">
+                <div className="bg-white p-3 rounded-lg border border-indigo-200 shadow-sm">
                   <textarea 
                     value={bulkText}
                     onChange={(e) => setBulkText(e.target.value)}
-                    className="w-full h-24 text-xs border-slate-200 rounded-md focus:border-indigo-500 focus:ring-0 mb-2"
+                    className="w-full h-32 text-sm border-slate-200 rounded-md focus:border-indigo-500 focus:ring-0 mb-3 p-2"
                     placeholder="Alice&#10;Bob..."
                     autoFocus
                   />
                   <button 
                     onClick={handleBulkImport}
-                    className="w-full py-1.5 bg-indigo-600 text-white rounded text-xs font-bold hover:bg-indigo-700"
+                    className="w-full py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700"
                   >
                     Import
                   </button>
                 </div>
               )}
 
-              <div className="max-h-60 overflow-y-auto space-y-1 pr-1">
+              <div className="max-h-80 overflow-y-auto space-y-2 pr-1">
                 {students.map(student => (
-                  <div key={student.id} className="group flex items-center gap-1 bg-white p-1.5 rounded border border-slate-200 hover:border-indigo-300 transition-colors">
+                  <div key={student.id} className="group flex items-center gap-2 bg-white p-2 rounded-lg border border-slate-200 hover:border-indigo-300 transition-colors">
                     <input 
                       type="text" 
                       value={student.name}
                       onChange={(e) => updateStudent(student.id, 'name', e.target.value)}
-                      className="flex-1 text-xs font-medium border-none p-0 focus:ring-0 text-slate-700 bg-transparent placeholder-slate-300 outline-none"
+                      className="flex-1 text-sm font-medium border-none p-0 focus:ring-0 text-slate-700 bg-transparent placeholder-slate-300 outline-none"
                       placeholder="Name"
                     />
                     <select 
                       value={student.level}
                       onChange={(e) => updateStudent(student.id, 'level', e.target.value)}
-                      className={`text-[10px] font-bold rounded px-1 py-0.5 border-none focus:ring-0 cursor-pointer h-6 ${
+                      className={`text-xs font-bold rounded px-2 py-1 border-none focus:ring-0 cursor-pointer ${
                         student.level === 'High' ? 'bg-green-100 text-green-700' :
                         student.level === 'Low' ? 'bg-orange-100 text-orange-700' :
                         'bg-blue-100 text-blue-700'
@@ -776,9 +775,9 @@ ${groupsList}
                     </select>
                     <button 
                       onClick={() => removeStudent(student.id)}
-                      className="text-slate-300 hover:text-red-500 p-0.5"
+                      className="text-slate-300 hover:text-red-500 p-1 rounded hover:bg-red-50"
                     >
-                      <Trash2 className="w-3 h-3" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 ))}
@@ -788,39 +787,39 @@ ${groupsList}
 
           {/* SECTION 3: Rules */}
           <AccordionSection title="Rules & Constraints" icon={AlertCircle}>
-             <div className="space-y-3">
+             <div className="space-y-4">
                 <div className="flex gap-2">
                   <button 
                     onClick={() => addRule('separate')}
-                    className="flex-1 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded text-[10px] font-bold flex items-center justify-center gap-1 hover:bg-red-100"
+                    className="flex-1 py-2.5 bg-red-50 text-red-600 border border-red-200 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-red-100"
                   >
-                    <Ban className="w-3 h-3" /> Separate
+                    <Ban className="w-4 h-4" /> Separate
                   </button>
                   <button 
                     onClick={() => addRule('pair')}
-                    className="flex-1 py-1.5 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded text-[10px] font-bold flex items-center justify-center gap-1 hover:bg-emerald-100"
+                    className="flex-1 py-2.5 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-emerald-100"
                   >
-                    <LinkIcon className="w-3 h-3" /> Pair
+                    <LinkIcon className="w-4 h-4" /> Pair
                   </button>
                 </div>
 
                 <div className="space-y-2">
-                  {rules.length === 0 && <p className="text-center text-xs text-slate-400 italic">No rules defined.</p>}
+                  {rules.length === 0 && <p className="text-center text-sm text-slate-400 italic py-4">No rules defined.</p>}
                   {rules.map(rule => (
-                    <div key={rule.id} className="bg-white p-2 rounded border border-slate-200 flex flex-col gap-1 relative">
+                    <div key={rule.id} className="bg-white p-3 rounded-lg border border-slate-200 flex flex-col gap-2 relative shadow-sm">
                        <div className={`text-[10px] font-bold uppercase flex items-center gap-1 ${rule.type === 'separate' ? 'text-red-500' : 'text-emerald-500'}`}>
                           {rule.type === 'separate' ? 'Separate' : 'Pair'}
                        </div>
-                       <div className="flex items-center gap-1">
+                       <div className="flex items-center gap-2">
                           <select 
-                            className="flex-1 text-xs border-slate-200 rounded p-1"
+                            className="flex-1 text-sm border-slate-200 rounded p-1.5 bg-slate-50"
                             value={rule.studentAId}
                             onChange={(e) => updateRule(rule.id, 'studentAId', e.target.value)}
                           >
                             {students.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                           </select>
                           <select 
-                            className="flex-1 text-xs border-slate-200 rounded p-1"
+                            className="flex-1 text-sm border-slate-200 rounded p-1.5 bg-slate-50"
                             value={rule.studentBId}
                             onChange={(e) => updateRule(rule.id, 'studentBId', e.target.value)}
                           >
@@ -829,7 +828,7 @@ ${groupsList}
                        </div>
                        <button 
                           onClick={() => removeRule(rule.id)}
-                          className="absolute top-1 right-1 text-slate-300 hover:text-red-500"
+                          className="absolute top-2 right-2 text-slate-300 hover:text-red-500 p-1"
                         >
                           <X className="w-3 h-3" />
                         </button>
@@ -841,14 +840,14 @@ ${groupsList}
 
           {/* SECTION 4: AI Visualization */}
           <AccordionSection title="AI Visualization" icon={Sparkles}>
-            <div className="space-y-3">
-              <p className="text-[10px] text-slate-500 leading-relaxed">
+            <div className="space-y-4">
+              <p className="text-xs text-slate-500 leading-relaxed">
                 Generate a specific prompt for this classroom layout to use with external AI image generators (like Gemini, Midjourney, etc).
               </p>
               
               <button 
                 onClick={handleOpenPromptModal}
-                className="w-full py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-bold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
                 title="Copy Prompt for External AI"
               >
                 <Copy className="w-4 h-4" /> Get AI Prompt
@@ -858,10 +857,10 @@ ${groupsList}
 
           {/* SECTION 5: Design */}
           <AccordionSection title="Appearance" icon={Palette}>
-              <div className="space-y-4">
+              <div className="space-y-5">
                  {/* Font Selector */}
                  <div>
-                    <label className="text-[10px] font-bold text-slate-400 uppercase mb-2 block flex items-center gap-1">
+                    <label className="text-xs font-bold text-slate-500 uppercase mb-2 block flex items-center gap-1">
                        <Type className="w-3 h-3" /> Typography
                     </label>
                     <div className="grid grid-cols-2 gap-2">
@@ -869,7 +868,7 @@ ${groupsList}
                           <button
                             key={fontName}
                             onClick={() => setConfig({ ...config, font: fontName })}
-                            className={`px-2 py-1.5 rounded text-[10px] border transition-all text-left truncate ${
+                            className={`px-3 py-2 rounded-lg text-xs border transition-all text-left truncate ${
                                config.font === fontName 
                                ? 'bg-indigo-50 border-indigo-500 text-indigo-700 font-bold' 
                                : 'border-slate-200 text-slate-600 hover:bg-slate-50'
@@ -884,14 +883,14 @@ ${groupsList}
 
                  {/* Font Size Selector */}
                  <div>
-                    <label className="text-[10px] font-bold text-slate-400 uppercase mb-1 flex justify-between">
+                    <label className="text-xs font-bold text-slate-500 uppercase mb-2 flex justify-between">
                        <span>Font Size</span>
                        <span>{config.fontSize}px</span>
                     </label>
                     <input 
                       type="range" 
                       min="8" 
-                      max="20" 
+                      max="24" 
                       step="1"
                       value={config.fontSize}
                       onChange={(e) => setConfig({ ...config, fontSize: parseInt(e.target.value) })}
@@ -901,44 +900,44 @@ ${groupsList}
 
                  {/* Image Upload */}
                  <div>
-                    <label className="text-[10px] font-bold text-slate-400 uppercase mb-2 block">Background</label>
+                    <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">Background</label>
                     <div 
-                         className="w-full h-16 border-2 border-dashed border-slate-300 rounded-lg flex items-center justify-center cursor-pointer hover:bg-slate-50 hover:border-indigo-400 transition-colors relative overflow-hidden"
+                         className="w-full h-20 border-2 border-dashed border-slate-300 rounded-lg flex items-center justify-center cursor-pointer hover:bg-slate-50 hover:border-indigo-400 transition-colors relative overflow-hidden"
                          onClick={() => fileInputRef.current?.click()}
                        >
                          {config.customBgImage ? (
                             <>
                               <img src={config.customBgImage} alt="Custom bg" className="absolute inset-0 w-full h-full object-cover opacity-50" />
                               <div className="absolute inset-0 flex items-center justify-center bg-black/10">
-                                <span className="text-[10px] font-bold text-white flex items-center gap-1">
-                                  <ImageIcon className="w-3 h-3" /> Change
+                                <span className="text-xs font-bold text-white flex items-center gap-1">
+                                  <ImageIcon className="w-4 h-4" /> Change
                                 </span>
                               </div>
                             </>
                          ) : (
-                           <span className="text-[10px] text-slate-500 flex items-center gap-1">
-                             <Upload className="w-3 h-3" /> Upload Floor Image
+                           <span className="text-xs text-slate-500 flex items-center gap-2">
+                             <Upload className="w-4 h-4" /> Upload Floor Image
                            </span>
                          )}
                          <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageUpload} />
                     </div>
                     {config.customBgImage && (
-                       <button onClick={() => setConfig({ ...config, customBgImage: null })} className="text-[10px] text-red-500 flex items-center gap-1 hover:underline mt-1">
+                       <button onClick={() => setConfig({ ...config, customBgImage: null })} className="text-xs text-red-500 flex items-center gap-1 hover:underline mt-2">
                          <X className="w-3 h-3" /> Remove image
                        </button>
                     )}
                 </div>
 
                 <div>
-                   <label className="text-[10px] font-bold text-slate-400 uppercase mb-2 block">Color Theme</label>
+                   <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">Color Theme</label>
                    <div className="grid grid-cols-3 gap-2">
                     {Object.values(THEMES).map(t => (
                       <button
                         key={t.id}
                         onClick={() => setConfig({...config, theme: t.id})}
-                        className={`p-1.5 rounded-lg text-[10px] font-medium transition-all border-2 flex flex-col items-center gap-1 ${config.theme === t.id ? 'border-indigo-500 bg-indigo-50' : 'border-transparent hover:bg-slate-100'}`}
+                        className={`p-2 rounded-lg text-xs font-medium transition-all border-2 flex flex-col items-center gap-1.5 ${config.theme === t.id ? 'border-indigo-500 bg-indigo-50' : 'border-transparent hover:bg-slate-100'}`}
                       >
-                        <div className="w-full h-4 rounded border border-slate-100" style={{ background: t.bg }}></div>
+                        <div className="w-full h-5 rounded border border-slate-100" style={{ background: t.bg }}></div>
                         <span className="text-slate-600 truncate w-full text-center">{t.name}</span>
                       </button>
                     ))}
@@ -950,24 +949,24 @@ ${groupsList}
         </div>
 
         {/* Action Footer */}
-        <div className="p-4 border-t border-slate-200 bg-white space-y-3 z-30 shadow-[0_-5px_15px_-5px_rgba(0,0,0,0.1)]">
+        <div className="p-6 border-t border-slate-200 bg-white space-y-3 z-30 shadow-[0_-5px_15px_-5px_rgba(0,0,0,0.1)]">
           <button 
             onClick={generateGroups}
-            className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white hover:bg-indigo-700 py-3 rounded-lg font-bold shadow-lg shadow-indigo-200 transition-all active:scale-95"
+            className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white hover:bg-indigo-700 py-3.5 rounded-lg font-bold shadow-lg shadow-indigo-200 transition-all active:scale-95 text-sm"
           >
-            <Shuffle className="w-4 h-4" /> Re-Shuffle Seating
+            <Shuffle className="w-5 h-5" /> Re-Shuffle Seating
           </button>
           <button 
             onClick={handleDownloadPDF}
             disabled={isGeneratingPdf}
-            className="w-full flex items-center justify-center gap-2 bg-slate-800 text-white hover:bg-slate-900 py-2 rounded-lg font-semibold transition-all active:scale-95 disabled:opacity-50 disabled:cursor-wait"
+            className="w-full flex items-center justify-center gap-2 bg-slate-800 text-white hover:bg-slate-900 py-3 rounded-lg font-semibold transition-all active:scale-95 disabled:opacity-50 disabled:cursor-wait text-sm"
             title="Download high-quality PDF"
           >
-            {isGeneratingPdf ? 'Generating...' : <><FileText className="w-4 h-4" /> Download PDF</>}
+            {isGeneratingPdf ? 'Generating...' : <><FileText className="w-5 h-5" /> Download PDF</>}
           </button>
           
           {/* Credits */}
-          <div className="pt-2 border-t border-slate-100 text-center">
+          <div className="pt-3 border-t border-slate-100 text-center">
             <p className="text-[10px] text-slate-400 mb-1">Created by Hussam Abed Alfattah</p>
             <a 
               href="https://www.linkedin.com/in/husam-abed-al-fattah-350053138" 
