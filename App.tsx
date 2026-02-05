@@ -571,7 +571,7 @@ ${groupsList}
       )}
 
       {/* --- SIDEBAR --- */ }
-      <div className="w-96 flex-shrink-0 bg-white border-r border-slate-200 flex flex-col z-20 shadow-xl no-print" style={{ fontFamily: 'Fredoka, sans-serif' }}>
+      <div className="w-[450px] flex-shrink-0 bg-white border-r border-slate-200 flex flex-col z-20 shadow-xl no-print" style={{ fontFamily: 'Fredoka, sans-serif' }}>
         
         {/* Header */}
         <div className="p-6 border-b border-slate-100 bg-slate-50">
