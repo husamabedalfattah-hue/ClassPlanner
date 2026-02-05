@@ -25,6 +25,7 @@ export interface Config {
   customBgImage: string | null;
   layoutMode: 'circle' | 'rect' | 'row';
   font: string;
+  fontSize: number;
 }
 
 export interface ThemeGroup {

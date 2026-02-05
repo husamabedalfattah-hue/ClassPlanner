@@ -30,7 +30,10 @@ import {
   Maximize2,
   Copy,
   Check,
-  Type
+  Type,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw
 } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -99,11 +102,15 @@ export default function App() {
     subject: 'Chemistry',
     customBgImage: null,
     layoutMode: 'circle',
-    font: 'Fredoka'
+    font: 'Fredoka',
+    fontSize: 12
   });
   const [generatedGroups, setGeneratedGroups] = useState<Student[][]>([]);
   const [groupNames, setGroupNames] = useState<Record<number, string>>({});
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  
+  // UI State
+  const [zoomLevel, setZoomLevel] = useState(1);
   
   // Prompt Export State
   const [showPromptModal, setShowPromptModal] = useState(false);
@@ -395,11 +402,14 @@ export default function App() {
   const handleDownloadPDF = async () => {
     if (!printRef.current) return;
     
+    // Store current zoom level and reset to 1
+    const previousZoom = zoomLevel;
     setIsGeneratingPdf(true);
+    setZoomLevel(1);
     
     try {
-      // Small delay to allow any UI updates
-      await new Promise(resolve => setTimeout(resolve, 50));
+      // Small delay to allow UI to reset to zoom 1
+      await new Promise(resolve => setTimeout(resolve, 300));
 
       const canvas = await html2canvas(printRef.current, {
         scale: 3, // High resolution for clear names
@@ -429,8 +439,14 @@ export default function App() {
       alert('Could not generate PDF. Please use the system Print option instead.');
     } finally {
       setIsGeneratingPdf(false);
+      setZoomLevel(previousZoom);
     }
   };
+
+  // --- ZOOM HANDLERS ---
+  const handleZoomIn = () => setZoomLevel(prev => Math.min(prev + 0.1, 2));
+  const handleZoomOut = () => setZoomLevel(prev => Math.max(prev - 0.1, 0.5));
+  const handleZoomReset = () => setZoomLevel(1);
 
   // --- AI PROMPT BUILDER ---
   const buildAiPrompt = () => {
@@ -866,6 +882,23 @@ ${groupsList}
                     </div>
                  </div>
 
+                 {/* Font Size Selector */}
+                 <div>
+                    <label className="text-[10px] font-bold text-slate-400 uppercase mb-1 flex justify-between">
+                       <span>Font Size</span>
+                       <span>{config.fontSize}px</span>
+                    </label>
+                    <input 
+                      type="range" 
+                      min="8" 
+                      max="20" 
+                      step="1"
+                      value={config.fontSize}
+                      onChange={(e) => setConfig({ ...config, fontSize: parseInt(e.target.value) })}
+                      className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                    />
+                 </div>
+
                  {/* Image Upload */}
                  <div>
                     <label className="text-[10px] font-bold text-slate-400 uppercase mb-2 block">Background</label>
@@ -962,63 +995,104 @@ ${groupsList}
         {config.customBgImage && (
           <div className="absolute inset-0 bg-white/50 pointer-events-none"></div>
         )}
+
+        {/* ZOOM CONTROLS */}
+        <div className="fixed top-5 right-5 z-40 bg-white shadow-lg rounded-lg flex flex-col gap-1 p-1 border border-slate-200 no-print">
+            <button 
+              onClick={handleZoomIn}
+              className="p-1.5 hover:bg-slate-100 text-slate-600 rounded"
+              title="Zoom In"
+            >
+              <ZoomIn className="w-4 h-4" />
+            </button>
+            <div className="text-[10px] font-bold text-center text-slate-400 border-y border-slate-100 py-1">
+              {Math.round(zoomLevel * 100)}%
+            </div>
+            <button 
+              onClick={handleZoomOut}
+              className="p-1.5 hover:bg-slate-100 text-slate-600 rounded"
+              title="Zoom Out"
+            >
+              <ZoomOut className="w-4 h-4" />
+            </button>
+            <button 
+              onClick={handleZoomReset}
+              className="p-1.5 hover:bg-slate-100 text-slate-600 rounded border-t border-slate-100"
+              title="Reset Zoom"
+            >
+              <RotateCcw className="w-3 h-3" />
+            </button>
+        </div>
         
         {/* WE MOVE THE printRef HERE TO CAPTURE THE BACKGROUND TOO */}
+        {/* Added wrapper for zoom scaling */}
         <div 
-          ref={printRef} 
-          className="min-h-full p-12 flex flex-col items-center relative z-10 w-fit mx-auto min-w-full"
-          style={{
-             // Ensure background is inherited/visible when capturing this specific element
-             // We duplicate the background styles here for the capture element
-             backgroundColor: config.customBgImage ? 'rgba(255,255,255,0.8)' : currentTheme.bg, 
-             backgroundImage: config.customBgImage ? `url(${config.customBgImage})` : currentTheme.floor,
-             backgroundSize: config.customBgImage ? 'cover' : currentTheme.floorSize,
+          style={{ 
+            transform: `scale(${zoomLevel})`, 
+            transformOrigin: 'top center',
+            width: 'fit-content',
+            minWidth: '100%',
+            margin: '0 auto',
+            transition: 'transform 0.2s ease-out'
           }}
         >
-          
-          {/* Paper Header (Print View) */}
-          <div className="text-center mb-12 bg-white/95 backdrop-blur-sm px-10 py-6 rounded-xl shadow-lg border border-slate-200 max-w-2xl w-full relative transform rotate-1 hover:rotate-0 transition-transform duration-500 page-break">
-            {/* Thumbtack visual */}
-            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full bg-red-500 shadow-sm border-2 border-red-700 z-10"></div>
+          <div 
+            ref={printRef} 
+            className="min-h-full p-12 flex flex-col items-center relative z-10 w-fit mx-auto min-w-full"
+            style={{
+              // Ensure background is inherited/visible when capturing this specific element
+              // We duplicate the background styles here for the capture element
+              backgroundColor: config.customBgImage ? 'rgba(255,255,255,0.8)' : currentTheme.bg, 
+              backgroundImage: config.customBgImage ? `url(${config.customBgImage})` : currentTheme.floor,
+              backgroundSize: config.customBgImage ? 'cover' : currentTheme.floorSize,
+            }}
+          >
             
-            <h2 className="text-3xl font-black text-slate-800 mb-1 tracking-tight">{config.className || 'Classroom Plan'}</h2>
-            <h3 className="text-xl font-bold text-indigo-600 mb-2">{config.subject || 'Seating Chart'}</h3>
-            
-            <div className="flex items-center justify-center gap-3 text-slate-500 font-medium text-sm">
-               <span className="flex items-center gap-1"><Users className="w-4 h-4"/> {students.length} Students</span>
-               <span className="text-slate-300">|</span>
-               <span className="flex items-center gap-1"><GraduationCap className="w-4 h-4"/> {config.teacherName || 'Teacher'}</span>
+            {/* Paper Header (Print View) */}
+            <div className="text-center mb-12 bg-white/95 backdrop-blur-sm px-10 py-6 rounded-xl shadow-lg border border-slate-200 max-w-2xl w-full relative transform rotate-1 hover:rotate-0 transition-transform duration-500 page-break">
+              {/* Thumbtack visual */}
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full bg-red-500 shadow-sm border-2 border-red-700 z-10"></div>
+              
+              <h2 className="text-3xl font-black text-slate-800 mb-1 tracking-tight">{config.className || 'Classroom Plan'}</h2>
+              <h3 className="text-xl font-bold text-indigo-600 mb-2">{config.subject || 'Seating Chart'}</h3>
+              
+              <div className="flex items-center justify-center gap-3 text-slate-500 font-medium text-sm">
+                <span className="flex items-center gap-1"><Users className="w-4 h-4"/> {students.length} Students</span>
+                <span className="text-slate-300">|</span>
+                <span className="flex items-center gap-1"><GraduationCap className="w-4 h-4"/> {config.teacherName || 'Teacher'}</span>
+              </div>
+              
+              <div className="absolute top-4 right-4 text-[10px] text-slate-300 font-mono hidden md:block">
+                {new Date().toLocaleDateString()}
+              </div>
             </div>
             
-            <div className="absolute top-4 right-4 text-[10px] text-slate-300 font-mono hidden md:block">
-              {new Date().toLocaleDateString()}
-            </div>
+            {/* Table Grid */}
+            {generatedGroups.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-20 w-full max-w-7xl mx-auto px-4 pb-20 grid-print-layout">
+                {generatedGroups.map((group, groupIndex) => (
+                  <TableGroup 
+                    key={groupIndex}
+                    index={groupIndex}
+                    students={group}
+                    theme={currentTheme}
+                    groupSize={config.groupSize}
+                    strategy={config.strategy}
+                    layoutMode={config.layoutMode}
+                    name={groupNames[groupIndex] || `Group ${groupIndex + 1}`}
+                    fontSize={config.fontSize}
+                    onRename={(newName) => handleGroupNameChange(groupIndex, newName)}
+                    onStudentDrop={handleStudentDrop}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center text-slate-400 mt-20 bg-white/50 p-10 rounded-xl">
+                <LayoutGrid className="w-16 h-16 mb-4 opacity-50" />
+                <p className="text-xl font-medium">Add students to the roster to begin!</p>
+              </div>
+            )}
           </div>
-          
-          {/* Table Grid */}
-          {generatedGroups.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-20 w-full max-w-7xl mx-auto px-4 pb-20 grid-print-layout">
-              {generatedGroups.map((group, groupIndex) => (
-                <TableGroup 
-                  key={groupIndex}
-                  index={groupIndex}
-                  students={group}
-                  theme={currentTheme}
-                  groupSize={config.groupSize}
-                  strategy={config.strategy}
-                  layoutMode={config.layoutMode}
-                  name={groupNames[groupIndex] || `Group ${groupIndex + 1}`}
-                  onRename={(newName) => handleGroupNameChange(groupIndex, newName)}
-                  onStudentDrop={handleStudentDrop}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center text-slate-400 mt-20 bg-white/50 p-10 rounded-xl">
-              <LayoutGrid className="w-16 h-16 mb-4 opacity-50" />
-              <p className="text-xl font-medium">Add students to the roster to begin!</p>
-            </div>
-          )}
         </div>
       </div>
     </div>

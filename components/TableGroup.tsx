@@ -9,11 +9,12 @@ interface TableGroupProps {
   strategy: string;
   layoutMode: 'circle' | 'rect' | 'row';
   name: string;
+  fontSize: number;
   onRename: (newName: string) => void;
   onStudentDrop: (studentId: string, targetIndex: number) => void;
 }
 
-const TableGroup: React.FC<TableGroupProps> = ({ index, students, theme, layoutMode, name, onRename, onStudentDrop }) => {
+const TableGroup: React.FC<TableGroupProps> = ({ index, students, theme, layoutMode, name, fontSize, onRename, onStudentDrop }) => {
   const colorTheme = theme.groups[index % theme.groups.length];
   const [isDragOver, setIsDragOver] = useState(false);
   
@@ -34,6 +35,12 @@ const TableGroup: React.FC<TableGroupProps> = ({ index, students, theme, layoutM
       onStudentDrop(studentId, index);
     }
   };
+
+  // Helper for consistent seat styling
+  const getSeatTextStyle = () => ({
+    fontSize: `${fontSize}px`,
+    lineHeight: '1.1'
+  });
 
   // --- RENDERERS ---
 
@@ -85,13 +92,16 @@ const TableGroup: React.FC<TableGroupProps> = ({ index, students, theme, layoutM
                 e.dataTransfer.setData('studentId', student.id);
                 e.dataTransfer.effectAllowed = 'move';
               }}
-              className="absolute top-1/2 left-1/2 flex flex-col items-center justify-center w-20 h-20 rounded-full shadow-lg bg-white border-4 transition-all duration-300 hover:scale-110 hover:z-50 z-20 cursor-move"
+              className="absolute top-1/2 left-1/2 flex items-center justify-center w-20 h-20 rounded-full shadow-lg bg-white border-4 transition-all duration-300 hover:scale-110 hover:z-50 z-20 cursor-move"
               style={{
                 borderColor: colorTheme.main,
                 transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
               }}
             >
-               <span className="text-xs font-bold text-slate-700 text-center leading-tight px-1 line-clamp-2 select-none pointer-events-none">
+               <span 
+                 className="font-bold text-slate-700 text-center px-1 line-clamp-3 select-none pointer-events-none w-full break-words"
+                 style={getSeatTextStyle()}
+               >
                 {student.name}
               </span>
             </div>
@@ -122,7 +132,12 @@ const TableGroup: React.FC<TableGroupProps> = ({ index, students, theme, layoutM
               className="w-20 h-16 bg-white rounded-lg shadow-md border-b-4 flex items-center justify-center p-1 cursor-move hover:scale-105 transition-transform"
               style={{ borderColor: colorTheme.main }}
             >
-               <span className="text-xs font-bold text-slate-700 text-center select-none pointer-events-none line-clamp-2">{student.name}</span>
+               <span 
+                 className="font-bold text-slate-700 text-center select-none pointer-events-none line-clamp-2 w-full break-words"
+                 style={getSeatTextStyle()}
+               >
+                 {student.name}
+               </span>
             </div>
           ))}
         </div>
@@ -161,7 +176,12 @@ const TableGroup: React.FC<TableGroupProps> = ({ index, students, theme, layoutM
              className="w-20 h-16 bg-white rounded-lg shadow-md border-t-4 flex items-center justify-center p-1 cursor-move hover:scale-105 transition-transform"
              style={{ borderColor: colorTheme.main }}
            >
-              <span className="text-xs font-bold text-slate-700 text-center select-none pointer-events-none line-clamp-2">{student.name}</span>
+              <span 
+                className="font-bold text-slate-700 text-center select-none pointer-events-none line-clamp-2 w-full break-words"
+                style={getSeatTextStyle()}
+              >
+                {student.name}
+              </span>
            </div>
           ))}
         </div>
@@ -201,8 +221,13 @@ const TableGroup: React.FC<TableGroupProps> = ({ index, students, theme, layoutM
                 className="w-24 h-20 bg-white rounded shadow-sm border border-slate-200 flex flex-col relative overflow-hidden group hover:shadow-md transition-all cursor-move"
               >
                   <div className="h-1 w-full" style={{ backgroundColor: colorTheme.main }}></div>
-                  <div className="flex-1 flex items-center justify-center p-2">
-                    <span className="text-xs font-bold text-slate-700 text-center select-none pointer-events-none line-clamp-2">{student.name}</span>
+                  <div className="flex-1 flex items-center justify-center p-1.5 w-full">
+                    <span 
+                      className="font-bold text-slate-700 text-center select-none pointer-events-none line-clamp-3 w-full break-words"
+                      style={getSeatTextStyle()}
+                    >
+                      {student.name}
+                    </span>
                   </div>
                   <div className="h-1 w-full bg-slate-100 mt-auto"></div>
               </div>
